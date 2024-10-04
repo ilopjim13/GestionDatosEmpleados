@@ -1,5 +1,6 @@
 package org.example.repository
 
+import org.example.console.Console
 import org.example.model.Empleado
 import org.w3c.dom.Element
 import org.w3c.dom.Node
@@ -10,7 +11,7 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 
-class XmlRepository(private val fileXml:Path) {
+class XmlRepository(private val fileXml:Path, private val console: Console) {
 
     fun empleadosXml(listaEmpleados: List<Empleado>, id:Int = -1, sal:Double = -1.0) {
         val dbf = DocumentBuilderFactory.newInstance()
@@ -66,7 +67,7 @@ class XmlRepository(private val fileXml:Path) {
                 val departamento = nodoElement.getElementsByTagName("departamento").item(0).textContent
                 val salario = nodoElement.getElementsByTagName("salario").item(0).textContent
 
-                println("ID: $id, Apellido: $apellido, Departamento: $departamento, Salario: $salario")
+                console.showMessage("ID: $id, Apellido: $apellido, Departamento: $departamento, Salario: $salario")
             }
         }
     }
