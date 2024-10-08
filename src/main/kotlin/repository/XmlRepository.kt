@@ -2,6 +2,7 @@ package org.example.repository
 
 import org.example.console.Console
 import org.example.model.Empleado
+import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.nio.file.Path
@@ -13,12 +14,17 @@ import javax.xml.transform.stream.StreamResult
 
 class XmlRepository(private val fileXml:Path, private val console: Console) {
 
-    fun empleadosXml(listaEmpleados: List<Empleado>, id:Int = -1, sal:Double = -1.0) {
+    fun empleadosXml(listaEmpleados: List<Empleado>) {
         val dbf = DocumentBuilderFactory.newInstance()
         val db = dbf.newDocumentBuilder()
         val dip = db.domImplementation
         val document = dip.createDocument(null, "empleados", null)
 
+        writeXml(document,listaEmpleados)
+
+    }
+
+    private fun writeXml(document: Document, listaEmpleados: List<Empleado>, id:Int = -1, sal:Double = -1.0) {
         listaEmpleados.forEach {
             val empleado = document.createElement("empleado")
             empleado.setAttribute("id", it.id.toString())
@@ -39,15 +45,45 @@ class XmlRepository(private val fileXml:Path, private val console: Console) {
             departamento.appendChild(textDepartamento)
             salario.appendChild(textSalario)
         }
-
         val source = DOMSource(document)
         val result = StreamResult(fileXml.toFile())
-
         val transformer = TransformerFactory.newInstance().newTransformer()
         transformer.setOutputProperty(OutputKeys.INDENT, "yes")
-
         transformer.transform(source, result)
     }
+
+
+    fun modifyXml(id:Int, sal:Double) {
+        val dbf = DocumentBuilderFactory.newInstance()
+        val db = dbf.newDocumentBuilder()
+        val dct = db.parse(fileXml.toFile())
+        val root = dct.documentElement
+        root.normalize()
+
+        val listaNodos = root.getElementsByTagName("empleado")
+        val listaEmpleados: MutableList<Empleado> = mutableListOf()
+
+        for (i in 0..<listaNodos.length) {
+            val nodo = listaNodos.item(i)
+
+            if (nodo.nodeType == Node.ELEMENT_NODE) {
+                val nodoElemento = nodo as Element
+                val ids = nodoElemento.getAttribute("id").toIntOrNull() ?: 0
+                val apellido = nodoElemento.getElementsByTagName("apellido").item(0).textContent
+                val departamento = nodoElemento.getElementsByTagName("departamento").item(0).textContent
+                val salario = nodoElemento.getElementsByTagName("salario").item(0).textContent.toDouble()
+
+                val empleado = Empleado(ids, apellido, departamento, salario)
+                listaEmpleados.add(empleado)
+            }
+        }
+
+        val dip = db.domImplementation
+        val document = dip.createDocument(null, "empleados", null)
+
+        writeXml(document,listaEmpleados, id, sal)
+    }
+
 
     fun readXml() {
         val dbf = DocumentBuilderFactory.newInstance()

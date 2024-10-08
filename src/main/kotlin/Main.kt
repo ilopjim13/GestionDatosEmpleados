@@ -26,11 +26,6 @@ fun main() {
 
     } while (option != 4)
 
-//    xmlRepository.empleadosXml(empleados)
-//
-//    xmlRepository.empleadosXml(empleados, 1, 1333.3)
-//
-//    xmlRepository.readXml()
 
 }
 
@@ -40,7 +35,7 @@ fun executeMenu(option:Int, repository: XmlRepository, empleados:List<Empleado>,
         2 -> {
             val id = console.askId()
             val sal = console.askSal()
-            repository.empleadosXml(empleados, id, sal)
+            repository.modifyXml(id, sal)
         }
         3-> repository.readXml()
     }
