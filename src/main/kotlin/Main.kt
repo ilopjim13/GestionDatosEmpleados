@@ -25,8 +25,6 @@ fun main() {
         executeMenu(option, xmlRepository, empleados, console)
 
     } while (option != 4)
-
-
 }
 
 fun executeMenu(option:Int, repository: XmlRepository, empleados:List<Empleado>, console: Console) {

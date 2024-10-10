@@ -5,6 +5,7 @@ import org.example.model.Empleado
 import org.w3c.dom.Document
 import org.w3c.dom.Element
 import org.w3c.dom.Node
+import org.w3c.dom.NodeList
 import java.nio.file.Path
 import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.transform.OutputKeys
@@ -63,6 +64,15 @@ class XmlRepository(private val fileXml:Path, private val console: Console) {
         val listaNodos = root.getElementsByTagName("empleado")
         val listaEmpleados: MutableList<Empleado> = mutableListOf()
 
+        readElements(listaNodos, listaEmpleados)
+
+        val dip = db.domImplementation
+        val document = dip.createDocument(null, "empleados", null)
+
+        writeXml(document,listaEmpleados, id, sal)
+    }
+
+    private fun readElements(listaNodos: NodeList, listaEmpleados: MutableList<Empleado>? = null) {
         for (i in 0..<listaNodos.length) {
             val nodo = listaNodos.item(i)
 
@@ -74,14 +84,10 @@ class XmlRepository(private val fileXml:Path, private val console: Console) {
                 val salario = nodoElemento.getElementsByTagName("salario").item(0).textContent.toDouble()
 
                 val empleado = Empleado(ids, apellido, departamento, salario)
-                listaEmpleados.add(empleado)
+                if (listaEmpleados != null) listaEmpleados.add(empleado)
+                else console.showMessage(empleado.toString())
             }
         }
-
-        val dip = db.domImplementation
-        val document = dip.createDocument(null, "empleados", null)
-
-        writeXml(document,listaEmpleados, id, sal)
     }
 
 
@@ -93,19 +99,7 @@ class XmlRepository(private val fileXml:Path, private val console: Console) {
         root.normalize()
 
         val listaNodos = root.getElementsByTagName("empleado")
-        for (i in 0..<listaNodos.length ) {
-            val nodo = listaNodos.item(i)
-
-            if (nodo.nodeType == Node.ELEMENT_NODE) {
-                val nodoElement = nodo as Element
-                val id = nodoElement.getAttribute("id")
-                val apellido = nodoElement.getElementsByTagName("apellido").item(0).textContent
-                val departamento = nodoElement.getElementsByTagName("departamento").item(0).textContent
-                val salario = nodoElement.getElementsByTagName("salario").item(0).textContent
-
-                console.showMessage("ID: $id, Apellido: $apellido, Departamento: $departamento, Salario: $salario")
-            }
-        }
+        readElements(listaNodos)
     }
 
 }
