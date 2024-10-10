@@ -15,16 +15,22 @@ fun main() {
 
     val repository = EmpleadoRepository(fileCsv)
     val empleados = repository.generateEmpleados()
-
+//
     val xmlRepository = XmlRepository(fileXml, console)
+//
+//    var option:Int
+//    do {
+//        console.showMenu()
+//        option = console.askOption(4)
+//        executeMenu(option, xmlRepository, empleados, console)
+//
+//    } while (option != 4)
 
-    var option:Int
-    do {
-        console.showMenu()
-        option = console.askOption(4)
-        executeMenu(option, xmlRepository, empleados, console)
+    val emple = Empleado(empleados.size +1, "pepe", "dpt", 1500.0)
+    xmlRepository.newEmpleado(emple)
 
-    } while (option != 4)
+    xmlRepository.deleteEmple(2)
+
 }
 
 fun executeMenu(option:Int, repository: XmlRepository, empleados:List<Empleado>, console: Console) {
